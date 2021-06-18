@@ -5,6 +5,9 @@
 /build
 /dist
 
+# releases
+*.zip
+
 # config.json file for development
 /config.json
 
