@@ -1,0 +1,10 @@
+# node modules
+/node_modules
+
+# build and distribution
+/build
+/dist
+
+# config.json file for development
+/config.json
+
