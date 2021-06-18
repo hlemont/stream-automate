@@ -3,14 +3,13 @@
 	"obs": {
 		"address": "localhost",
 		"port": 4444,
-		"password": "1234",
+		"password": "1q2w3e4r",
 		"sceneAlias": {
 			"exampleAlias": "ActualSceneName"
 		}
 	},
 	"remote": {
 		"allowed": true,
-    "allowedType": ["key", "text", "mouse", "delay"],
 		"macros": {
 			"example": [
 				{

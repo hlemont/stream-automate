@@ -24,7 +24,6 @@ export type Control =
 
 export type Config = {
 	allowed: boolean;
-	allowedType: ControlType[];
 	macros: {
 		[macroName: string]: Control[];
 	};
@@ -46,23 +45,36 @@ export default class Remote {
 
 		router.route("/macro")
 		.get((req, res) => {
-			res.json({ success: true, macros: this.config.macros });
+			if(this.config.allowed){
+				res.json({ success: true, macros: this.config.macros });
+			} else {
+				res.json({ success: false, error: "remote control not allowed"});
+			}
 		})
 		.post((req, res) => {
 			if(!req.is("application/json")) {
 				res.status(400).send('bad request');
 			}
 
+			if(!this.config.allowed){
+				res.json({ success: false, error: "remote control not allowed"});
+				return;
+			}
+
 			const macro: Control[] = req.body;
 			this.runMacro(macro)
 			.then(() => res.json({ success: true }))
 			.catch((error: Error) => res.json({ success: false, error }));
-
 		})
 
 		router
 			.route("/macro/:name")
 			.get((req, res) => {
+				if(!this.config.allowed) {
+					res.json({ success: false, error: "remote control not allowed"});
+					return;
+				}
+
 				const { name: macroName } = req.params;
 				if (macroName in this.config.macros) {
 					res.json({
@@ -74,6 +86,11 @@ export default class Remote {
 				}
 			})
 			.post((req, res) => {
+				if(!this.config.allowed) {
+					res.json({ success: false, error: "remote control not allowed"});
+					return;
+				}
+
 				const { name: macroName } = req.params;
 				if (req.params.name in this.config.macros) {
 					const macro = this.config.macros[macroName];
@@ -88,7 +105,13 @@ export default class Remote {
 				res.status(400).send("bad request");
 				return;
 			}
-			console.log(req.body);
+
+			if(!this.config.allowed) {
+				res.json({ success: false, error: "remote control not allowed"});
+				return;	
+			}
+
+			console.log(`remote control:${JSON.stringify(req.body, undefined, 1)}`);
 
 			const control: Control = req.body;
 			this.runControl(control)

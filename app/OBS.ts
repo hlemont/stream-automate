@@ -38,7 +38,20 @@ export default class OBS {
 		this.router.use("/stream", this.streamRouter);
 		this.router.use("/record", this.recordRouter);
 
-		console.log(`obs.config: ${JSON.stringify({...this.config, password: [...this.config.password].reduce((prev, curr) => prev + '*', ""), sceneAlias: undefined}, undefined, 1)}`);
+		console.log(
+			`obs.config: ${JSON.stringify(
+				{
+					...this.config,
+					password: [...this.config.password].reduce(
+						(prev, curr) => prev + "*",
+						""
+					),
+					sceneAlias: undefined,
+				},
+				undefined,
+				1
+			)}`
+		);
 	}
 
 	public setConfig(newConfig: Config) {
@@ -54,7 +67,18 @@ export default class OBS {
 					return this.obs.send("GetSceneList");
 				})
 				.then((response) => {
-					const names = response.scenes.map((scene) => scene.name);
+					const names = response.scenes
+						.map((scene) => scene.name)
+						.map((name) => {
+							if (Object.values(this.config.sceneAlias).includes(name)) {
+								for (let alias in this.config.sceneAlias) {
+									if (name == this.config.sceneAlias[alias]) {
+										return alias;
+									}
+								}
+							}
+							return name;
+						});
 					console.log(
 						`Successfully got Scene list: ${names.slice(0, 3).join(", ")}`
 					);
@@ -74,16 +98,20 @@ export default class OBS {
 						return this.obs.send("GetCurrentScene");
 					})
 					.then((response) => {
-						let aliased: string = "";
-						for (let alias in this.config.sceneAlias) {
-							if (this.config.sceneAlias[alias] === response.name) {
-								aliased = this.config.sceneAlias[alias];
+						let { name } = response;
+						if (Object.values(this.config.sceneAlias).includes(name)) {
+							for (let alias in this.config.sceneAlias) {
+								if (this.config.sceneAlias[alias] === name) {
+									name = alias;
+									break;
+								}
 							}
 						}
-						console.log(`Current scene is: ${response.name}`);
+
+						console.log(`Current scene is: ${name}`);
 						res.json({
 							success: true,
-							name: aliased ? aliased : response.name,
+							name,
 						});
 					})
 					.catch((response) => {
