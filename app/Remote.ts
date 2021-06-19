@@ -36,6 +36,7 @@ export default class Remote {
 	constructor(config: Config) {
 		this.config = config;
 		this.remoteRouter = this.initRemoteRouter();
+		robotjs.setKeyboardDelay(1);
 
 		console.log(
 			`remote.config: ${JSON.stringify(
@@ -48,6 +49,45 @@ export default class Remote {
 
 	public initRemoteRouter() {
 		const router = Router();
+
+		
+		router
+			.route("/control")
+			.post((req, res) => {
+				if (!req.is("application/json")) {
+					res
+						.status(400)
+						.json({ error: "Content type should be application/json" });
+					return;
+				}
+
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
+					return;
+				}
+
+
+				const control: Control = req.body.control;
+				if(!control){
+			    res.status(400).json({ error: "missing request parameter: control"});
+				}
+
+				console.log(`remote control:${JSON.stringify(control, undefined, 1)}`);
+
+
+				this.runControl(control)
+					.then(() => res.status(204).send())
+					.catch((error) =>
+						(error.split(":")[0].split(" ")[0] === "invalid"
+							? res.status(400)
+							: res.status(500)
+						).json({ error })
+					);
+			})
+			.all((req, res) => {
+				res.status(405).send();
+			});
+
 
 		router
 			.route("/macro")
@@ -71,7 +111,14 @@ export default class Remote {
 					return;
 				}
 
-				const macro: Control[] = req.body;
+				const macro: Control[] = req.body.macro;
+				if(!macro){
+			    res.status(400).json({ error: "missing request parameters: macro"});
+				}
+
+				console.log(`remote macro:${JSON.stringify(macro, undefined, 1)}`);
+
+
 				this.runMacro(macro)
 					.then(() => res.status(204).send())
 					.catch((error) =>
@@ -99,7 +146,7 @@ export default class Remote {
 						macro: this.config.macros[macroName],
 					});
 				} else {
-					res.json({ error: `macro not found: ${macroName}` });
+					res.status(404).json({ error: `macro not found: ${macroName}` });
 				}
 			})
 			.post((req, res) => {
@@ -120,45 +167,14 @@ export default class Remote {
 				res.status(405).send();
 			});
 
-		router
-			.route("")
-			.post((req, res) => {
-				if (!req.is("application/json")) {
-					res
-						.status(400)
-						.json({ error: "Content type should be application/json" });
-					return;
-				}
-
-				if (!this.config.allowed) {
-					res.status(401).json({ error: "remote control not allowed" });
-					return;
-				}
-
-				console.log(`remote control:${JSON.stringify(req.body, undefined, 1)}`);
-
-				const control: Control = req.body;
-				this.runControl(control)
-					.then(() => res.status(204).send())
-					.catch((error) =>
-						(error.split(":")[0].split(" ")[0] === "invalid"
-							? res.status(400)
-							: res.status(500)
-						).json({ error })
-					);
-			})
-			.all((req, res) => {
-				res.status(405).send();
-			});
-
 		return router;
 	}
 
 	private isValidControl(control: Control) {
 		if (control.type === ControlType.keyTapping) {
-			return control.key !== undefined && control.key !== "";
+			return control.key !== undefined && typeof control.key === "string" && control.key !== "";
 		} else if (control.type === ControlType.stringTyping) {
-			return control.string !== undefined;
+			return control.string !== undefined && typeof control.string === "string";
 		} else if (control.type === ControlType.delaying) {
 			return control.delay !== undefined && !isNaN(control.delay);
 		} else return false;

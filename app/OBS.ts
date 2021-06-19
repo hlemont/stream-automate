@@ -219,7 +219,7 @@ export default class OBS {
 					.catch((response) => {
 						console.log(response);
 						if (response.error === `unknown action: ${action}`) {
-							res.status(404).json({ error: response.error });
+							res.status(400).json({ error: response.error });
 						} else {
 							res.status(500).json({ error: response.error });
 						}
@@ -267,7 +267,7 @@ export default class OBS {
 					.catch((response) => {
 						console.log(response);
 						if (response.error === `unknown action: ${action}`) {
-							res.status(404).json({ error: response.error });
+							res.status(400).json({ error: response.error });
 						} else {
 							res.status(500).json({ error: response.error });
 						}
