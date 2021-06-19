@@ -60,7 +60,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
 #### *config.json*: 
 
-```json
+```
 {
 	"serverPort": 4445,
 	"obs": {
@@ -100,7 +100,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
   장면 이름의 별칭
 
-```json
+```
 "sceneAlias": {
     [alias: string]: [sceneName: string]
 }
@@ -121,7 +121,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
   매크로를 미리 정의함
 
-```json
+```
 "macros": {
     "macroName": [ RemoteControl[] ]
 }
@@ -158,7 +158,7 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 
 #### RemoteControl
 
-```json
+```
 // key: keyTapping
 {
     "type": "key",
@@ -271,7 +271,7 @@ Returns Streaming Status.
 
 * *StreamingStatus*: [obs-websocket docs](https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md#getstreamingstatus)
 
-  ```json
+  ```
   {
       "message-id": [string], 
       "preview-only": [boolean], 
