@@ -22,6 +22,7 @@
 <p align="center"><a href="#installation">Installation</a></p>
 <p align="center"><a href="#Configuration">Configuration</a></p>
 <p align="center"><a href="#API-Documentations">API Documentations</a></a></p>
+<br/>
 
 ## Introduction
 
@@ -35,8 +36,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
 현재는 장면 전환 기능, 송출 및 녹화 시작/정지 기능과 원격 조작 기능을 구현하고 있습니다만, 필요성과 가능성에 따라 추가될 예정입니다. 
 
- 
-
+<br/>
 
 ## Installation
 
@@ -54,6 +54,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 4. 설치 폴더에 위치한 `config.json`을 편집기로 열고 `"obs.address"`, `"obs.port"`,  그리고 `"obs.password"`를 본인 상황에 맞게 설정해 주세요. 
 
 
+<br/>
 
 ## Configuration
 
@@ -105,9 +106,8 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 }
 ```
 
-Scene names of `alias` in API Request, will be replaced with `sceneName`. And scene names of `sceneName` in API Response, will be replaced with first matching `alias`.
-
-API 요청의 장면 이름 중 `alias`인 것은 `sceneName`으로, API 응답의 장면 이름 중 `sceneName`인 것은 첫 번째 매치된 `alias`로 교체됩니다. 
+> Scene names of `alias` in API Request, will be replaced with `sceneName`. And scene names of `sceneName` in API Response, will be replaced with first matching `alias`.
+> API 요청의 장면 이름 중 `alias`인 것은 `sceneName`으로, API 응답의 장면 이름 중 `sceneName`인 것은 첫 번째 매치된 `alias`로 교체됩니다. 
 
 
 
@@ -131,9 +131,7 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 
 
 
-
-
-
+<br/>
 
 #  API Documentations
 
@@ -154,7 +152,7 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 - [Remote](#Remote-2)
 - [Remote/Macro](#Remote/Macro)
 
-
+<br/>
 
 ### Typedef
 
@@ -181,10 +179,10 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 }
 ```
 
-Check [Robotjs API - keys](https://robotjs.io/docs/syntax#keys) for supported keys. `"modifiers"` accepts command, control, shift, alt.
-[Robotjs API - keys](https://robotjs.io/docs/syntax#keys)에서 지원되는 key 값을 확인해 주세요. `"modifiers"`는 command, control, shift, alt 키가 허용됩니다.
+> Check [Robotjs API - keys](https://robotjs.io/docs/syntax#keys) for supported keys. `"modifiers"` accepts command, control, shift, alt.
+> [Robotjs API - keys](https://robotjs.io/docs/syntax#keys)에서 지원되는 key 값을 확인해 주세요. `"modifiers"`는 command, control, shift, alt 키가 허용됩니다.
 
-
+<br/>
 
 ## OBS
 
@@ -192,7 +190,7 @@ Control scene, streaming, and recording by OBS WebSocket
 
 OBS WebSocket을 이용하여, 장면 및 스트리밍, 녹화 등을 조작합니다.
 
-
+<br/>
 
 ### OBS/Scene
 
@@ -215,12 +213,11 @@ Returns total list of scene.
 | **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "list": string[] }`  |
 | **Error Response**   | **Code:** 500  INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 #### Get Current Scene
 
 Returns current scene.
-
 현재 Scene을 반환합니다.
 
 | Title                | Get Current Scene                                            |
@@ -232,12 +229,11 @@ Returns current scene.
 | **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "name": [string] }`  |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 #### Set Current Scene
 
 Sets current Scene.
-
 현재 Scene을 설정합니다.
 
 | Title                | Set Current Scene                                            |
@@ -250,12 +246,11 @@ Sets current Scene.
 | **Error Response**   | **Code**: 404 Not Found<br />**Content:** `{ "error": "requested scene does not exist"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 ### OBS/Stream
 
 API Calls for fetching stream status and starting/stopping streaming.
-
 방송 송출 상태를 가져오고 방송 송출을 시작 및 중지하기 위한 API 호출입니다.
 
 
@@ -263,7 +258,6 @@ API Calls for fetching stream status and starting/stopping streaming.
 #### Get Streaming Status
 
 Returns Streaming Status.
-
 방송 송출 상태를 반환합니다.
 
 | Title                | Get Streaming Status                                         |
@@ -292,7 +286,7 @@ Returns Streaming Status.
   }
   ```
 
-
+<br/>
 
 #### Perform Streaming Action
 
@@ -310,7 +304,7 @@ Performs action of starting, stopping, toggling streaming.
 | **Error Response**   | **Code:** 400 Bad Request <br />**Content:** `{ "error": "unknown action: <action>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 ### OBS/Record
 
@@ -334,7 +328,7 @@ Performs action of starting, stopping, toggling recording
 | **Error Response**   | **Code:** 400 Bad Request <br />**Content:** `{ "error": "unknown action: <action>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+</br>
 
 ## Remote
 
@@ -361,7 +355,7 @@ Simulates user requested control.
 | **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "invalid control: <control>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 ### Remote/Macro
 
@@ -382,7 +376,7 @@ Simulates user requested macro, a simultaneous control.
 | **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "invalid macro: <macro>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 #### Get Pre-defined Macro list
 
@@ -399,7 +393,7 @@ Returns a list of macro pre-defined in config.
 | **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "macros": { [macroname]: RemoteControl[] } }` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 #### Get Pre-defined Macro
 
@@ -417,7 +411,7 @@ Returns a macro pre-defined in config.
 | **Error Response**   | **Code:** 404 Not Found<br />**Content:** `{ "error": "macro not found: <name>"}` |
 | **Error Response**   | **Code:** 500  INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
-
+<br/>
 
 #### Run Pre-defined Macro
 
