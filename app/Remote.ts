@@ -37,57 +37,74 @@ export default class Remote {
 		this.config = config;
 		this.remoteRouter = this.initRemoteRouter();
 
-		console.log(`remote.config: ${JSON.stringify({...this.config, macros: undefined}, undefined, 1)}`)
+		console.log(
+			`remote.config: ${JSON.stringify(
+				{ ...this.config, macros: undefined },
+				undefined,
+				1
+			)}`
+		);
 	}
 
 	public initRemoteRouter() {
 		const router = Router();
 
-		router.route("/macro")
-		.get((req, res) => {
-			if(this.config.allowed){
-				res.json({ success: true, macros: this.config.macros });
-			} else {
-				res.json({ success: false, error: "remote control not allowed"});
-			}
-		})
-		.post((req, res) => {
-			if(!req.is("application/json")) {
-				res.status(400).send('bad request');
-			}
+		router
+			.route("/macro")
+			.get((req, res) => {
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
+					return;
+				}
+				res.json({ macros: this.config.macros });
+			})
+			.post((req, res) => {
+				if (!req.is("application/json")) {
+					res
+						.status(400)
+						.json({ error: "Content type should be application/json" });
+					return;
+				}
 
-			if(!this.config.allowed){
-				res.json({ success: false, error: "remote control not allowed"});
-				return;
-			}
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
+					return;
+				}
 
-			const macro: Control[] = req.body;
-			this.runMacro(macro)
-			.then(() => res.json({ success: true }))
-			.catch((error: Error) => res.json({ success: false, error }));
-		})
+				const macro: Control[] = req.body;
+				this.runMacro(macro)
+					.then(() => res.status(204).send())
+					.catch((error) =>
+					(error.split(":")[0].split(" ")[0] === "invalid"
+						? res.status(400)
+						: res.status(500)
+					).json({ error })
+				);
+			})
+			.all((req, res) => {
+				res.status(405).send();
+			});
 
 		router
 			.route("/macro/:name")
 			.get((req, res) => {
-				if(!this.config.allowed) {
-					res.json({ success: false, error: "remote control not allowed"});
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
 					return;
 				}
 
 				const { name: macroName } = req.params;
 				if (macroName in this.config.macros) {
 					res.json({
-						success: true,
 						macro: this.config.macros[macroName],
 					});
 				} else {
-					res.json({ success: false, error: `macro not found: ${macroName}` });
+					res.json({ error: `macro not found: ${macroName}` });
 				}
 			})
 			.post((req, res) => {
-				if(!this.config.allowed) {
-					res.json({ success: false, error: "remote control not allowed"});
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
 					return;
 				}
 
@@ -95,29 +112,44 @@ export default class Remote {
 				if (req.params.name in this.config.macros) {
 					const macro = this.config.macros[macroName];
 					this.runMacro(macro)
-						.then(() => res.json({ success: true }))
-						.catch((error: Error) => res.json({ success: false, error }));
+						.then(() => res.status(204).send())
+						.catch((error: Error) => res.status(500).json({ error }));
 				}
+			})
+			.all((req, res) => {
+				res.status(405).send();
 			});
 
-		router.route("").post((req, res) => {
-			if (!req.is("application/json")) {
-				res.status(400).send("bad request");
-				return;
-			}
+		router
+			.route("")
+			.post((req, res) => {
+				if (!req.is("application/json")) {
+					res
+						.status(400)
+						.json({ error: "Content type should be application/json" });
+					return;
+				}
 
-			if(!this.config.allowed) {
-				res.json({ success: false, error: "remote control not allowed"});
-				return;	
-			}
+				if (!this.config.allowed) {
+					res.status(401).json({ error: "remote control not allowed" });
+					return;
+				}
 
-			console.log(`remote control:${JSON.stringify(req.body, undefined, 1)}`);
+				console.log(`remote control:${JSON.stringify(req.body, undefined, 1)}`);
 
-			const control: Control = req.body;
-			this.runControl(control)
-				.then(() => res.json({ success: true }))
-				.catch((error: Error) => res.json({ success: false, error }));
-		});
+				const control: Control = req.body;
+				this.runControl(control)
+					.then(() => res.status(204).send())
+					.catch((error) =>
+						(error.split(":")[0].split(" ")[0] === "invalid"
+							? res.status(400)
+							: res.status(500)
+						).json({ error })
+					);
+			})
+			.all((req, res) => {
+				res.status(405).send();
+			});
 
 		return router;
 	}
@@ -133,27 +165,28 @@ export default class Remote {
 	}
 
 	private isValidMacro(macro: Control[]) {
+		if (!Array.isArray(macro)) {
+			return false;
+		}
 		return macro.reduce((prev: boolean, curr: Control) => {
 			return prev && this.isValidControl(curr);
 		}, true);
 	}
 
 	private runMacro(macro: Control[]) {
-		if(this.isValidMacro(macro)) {
+		if (this.isValidMacro(macro)) {
 			return macro.reduce(async (previous: Promise<any>, current) => {
 				await previous;
 				return this.runControl(current);
 			}, Promise.resolve());
 		} else {
-			return Promise.reject(`invalid macro: ${macro.map((control) => control.type).join(', ')}, in ${macro.filter((control) => !this.isValidControl(control)).map((control) => control.type).join(', ')}`);
+			return Promise.reject(`invalid macro: ${JSON.stringify(macro)}`);
 		}
-
-
 	}
 
 	private runControl(control: Control) {
-		if(!this.isValidControl(control)){
-			return Promise.reject(`invalid control: ${control}`);
+		if (!this.isValidControl(control)) {
+			return Promise.reject(`invalid control: ${JSON.stringify(control)}`);
 		} else if (control.type === ControlType.keyTapping) {
 			return new Promise((resolve) => {
 				robotjs.keyTap(control.key, control.modifiers);

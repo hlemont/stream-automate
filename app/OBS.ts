@@ -61,34 +61,39 @@ export default class OBS {
 	private initSceneRouter() {
 		const router = Router();
 
-		router.get("", (req, res): void => {
-			this.connect()
-				.then(() => {
-					return this.obs.send("GetSceneList");
-				})
-				.then((response) => {
-					const names = response.scenes
-						.map((scene) => scene.name)
-						.map((name) => {
-							if (Object.values(this.config.sceneAlias).includes(name)) {
-								for (let alias in this.config.sceneAlias) {
-									if (name == this.config.sceneAlias[alias]) {
-										return alias;
+		router
+			.route("")
+			.get((req, res): void => {
+				this.connect()
+					.then(() => {
+						return this.obs.send("GetSceneList");
+					})
+					.then((response) => {
+						const names = response.scenes
+							.map((scene) => scene.name)
+							.map((name) => {
+								if (Object.values(this.config.sceneAlias).includes(name)) {
+									for (let alias in this.config.sceneAlias) {
+										if (name == this.config.sceneAlias[alias]) {
+											return alias;
+										}
 									}
 								}
-							}
-							return name;
-						});
-					console.log(
-						`Successfully got Scene list: ${names.slice(0, 3).join(", ")}`
-					);
-					res.json({ success: true, list: names });
-				})
-				.catch((response) => {
-					console.log(response);
-					res.json({ success: false, error: response.error });
-				});
-		});
+								return name;
+							});
+						console.log(
+							`Successfully got Scene list: ${names.slice(0, 3).join(", ")}`
+						);
+						res.json({ list: names });
+					})
+					.catch((response) => {
+						console.log(response);
+						res.status(500).json({ error: response.error });
+					});
+			})
+			.all((req, res) => {
+				res.status(405).send();
+			});
 
 		router
 			.route("/current")
@@ -110,18 +115,19 @@ export default class OBS {
 
 						console.log(`Current scene is: ${name}`);
 						res.json({
-							success: true,
 							name,
 						});
 					})
 					.catch((response) => {
 						console.log(response);
-						res.json({ success: false, error: response.error });
+						res.status(500).json({ error: response.error });
 					});
 			})
 			.post((req, res): void => {
 				if (!req.is("application/json")) {
-					res.status(400).send("bad request");
+					res
+						.status(400)
+						.json({ error: "Content type should be application/json" });
 					return;
 				}
 				const sceneName =
@@ -137,12 +143,19 @@ export default class OBS {
 					})
 					.then(() => {
 						console.log(`Current scene successfully set to: ${sceneName}`);
-						res.json({ success: true });
+						res.status(204).send();
 					})
 					.catch((response) => {
 						console.log(response);
-						res.json({ success: false, error: response.error });
+						if (response.error === "requested scene does not exist") {
+							res.status(404).json({ error: response.error });
+						} else {
+							res.status(500).json({ error: response.error });
+						}
 					});
+			})
+			.all((req, res) => {
+				res.status(405).send();
 			});
 
 		return router;
@@ -166,16 +179,18 @@ export default class OBS {
 								1
 							)}`
 						);
-						res.json({ success: true, status: response });
+						res.json({ status: response });
 					})
 					.catch((response) => {
 						console.log(response);
-						res.json({ success: false, error: response.error });
+						res.json({ error: response.error });
 					});
 			})
 			.post((req, res) => {
 				if (!req.is("application/json")) {
-					res.status(400).send("bad request");
+					res
+						.status(400)
+						.json({ error: "Content type should be application/json" });
 					return;
 				}
 
@@ -199,12 +214,19 @@ export default class OBS {
 					})
 					.then(() => {
 						console.log(`Stream [${action}]`);
-						res.json({ success: true });
+						res.status(204).send();
 					})
 					.catch((response) => {
 						console.log(response);
-						res.json({ success: false, error: response.error });
+						if (response.error === `unknown action: ${action}`) {
+							res.status(404).json({ error: response.error });
+						} else {
+							res.status(500).json({ error: response.error });
+						}
 					});
+			})
+			.all((req, res) => {
+				res.status(405).send();
 			});
 
 		return router;
@@ -213,38 +235,47 @@ export default class OBS {
 	private initRecordRouter() {
 		const router = Router();
 
-		router.route("").post((req, res) => {
-			if (!req.is("application/json")) {
-				res.status(400).send("bad request");
-				return;
-			}
-			const action: "start" | "stop" | "toggle" = req.body.action;
-			const request =
-				action === "start"
-					? "StartRecording"
-					: action === "stop"
-					? "StopRecording"
-					: action === "toggle"
-					? "StartStopRecording"
-					: undefined;
+		router
+			.route("")
+			.post((req, res) => {
+				if (!req.is("application/json")) {
+					res.status(400).send("bad request");
+					return;
+				}
+				const action: "start" | "stop" | "toggle" = req.body.action;
+				const request =
+					action === "start"
+						? "StartRecording"
+						: action === "stop"
+						? "StopRecording"
+						: action === "toggle"
+						? "StartStopRecording"
+						: undefined;
 
-			this.connect()
-				.then(() => {
-					if (request) {
-						return this.obs.send(request);
-					} else {
-						return Promise.reject({ error: `unknown action: ${action}` });
-					}
-				})
-				.then(() => {
-					console.log(`Record [${action}]`);
-					res.json({ success: true });
-				})
-				.catch((response) => {
-					console.log(response);
-					res.json({ success: false, error: response.error });
-				});
-		});
+				this.connect()
+					.then(() => {
+						if (request) {
+							return this.obs.send(request);
+						} else {
+							return Promise.reject({ error: `unknown action: ${action}` });
+						}
+					})
+					.then(() => {
+						console.log(`Record [${action}]`);
+						res.status(204).send();
+					})
+					.catch((response) => {
+						console.log(response);
+						if (response.error === `unknown action: ${action}`) {
+							res.status(404).json({ error: response.error });
+						} else {
+							res.status(500).json({ error: response.error });
+						}
+					});
+			})
+			.all((req, res) => {
+				res.status(405).send();
+			});
 
 		return router;
 	}
@@ -263,7 +294,7 @@ export default class OBS {
 						resolve(false);
 					})
 					.catch((response) => {
-						reject({ ...response, error: response.error + "*" });
+						reject({ ...response, error: response.error});
 					});
 			}
 		});
