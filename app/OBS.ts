@@ -5,7 +5,7 @@ export type Config = {
 	address: string;
 	port: number;
 	password: string;
-	sceneAlias: { [name: string]: string };
+	sceneAliases: { [name: string]: string };
 };
 
 export default class OBS {
@@ -46,7 +46,7 @@ export default class OBS {
 						(prev, curr) => prev + "*",
 						""
 					),
-					sceneAlias: undefined,
+					sceneAliases: undefined,
 				},
 				undefined,
 				1
@@ -72,9 +72,9 @@ export default class OBS {
 						const names = response.scenes
 							.map((scene) => scene.name)
 							.map((name) => {
-								if (Object.values(this.config.sceneAlias).includes(name)) {
-									for (let alias in this.config.sceneAlias) {
-										if (name == this.config.sceneAlias[alias]) {
+								if (Object.values(this.config.sceneAliases).includes(name)) {
+									for (let alias in this.config.sceneAliases) {
+										if (name == this.config.sceneAliases[alias]) {
 											return alias;
 										}
 									}
@@ -104,9 +104,9 @@ export default class OBS {
 					})
 					.then((response) => {
 						let { name } = response;
-						if (Object.values(this.config.sceneAlias).includes(name)) {
-							for (let alias in this.config.sceneAlias) {
-								if (this.config.sceneAlias[alias] === name) {
+						if (Object.values(this.config.sceneAliases).includes(name)) {
+							for (let alias in this.config.sceneAliases) {
+								if (this.config.sceneAliases[alias] === name) {
 									name = alias;
 									break;
 								}
@@ -131,8 +131,8 @@ export default class OBS {
 					return;
 				}
 				const sceneName =
-					req.body.name in this.config.sceneAlias
-						? this.config.sceneAlias[req.body.name]
+					req.body.name in this.config.sceneAliases
+						? this.config.sceneAliases[req.body.name]
 						: req.body.name;
 
 				this.connect()
