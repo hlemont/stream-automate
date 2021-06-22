@@ -210,7 +210,7 @@ Returns total list of scene.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "list": string[] }`  |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "list": string[] }`  |
 | **Error Response**   | **Code:** 500  INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -226,7 +226,7 @@ Returns current scene.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "name": [string] }`  |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "name": [string] }`  |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -243,7 +243,7 @@ Sets current Scene.
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | name: *[string]*                                             |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code**: 404 Not Found<br />**Content:** `{ "error": "requested scene does not exist"}` |
+| **Error Response**   | **Code**: 404 Not Found<br /> **Content:** `{ "error": "requested scene does not exist"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -266,7 +266,7 @@ Returns Streaming Status.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "status": [StreamingStatus] }` |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "status": [StreamingStatus] }` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 * *StreamingStatus*: [obs-websocket docs](https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md#getstreamingstatus)
@@ -301,7 +301,7 @@ Performs action of starting, stopping, toggling streaming.
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | action: "start" \| "stop" \| "toggle"                        |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 400 Bad Request <br />**Content:** `{ "error": "unknown action: <action>"}` |
+| **Error Response**   | **Code:** 400 Bad Request <br /> **Content:** `{ "error": "unknown action: <action>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -325,7 +325,7 @@ Performs action of starting, stopping, toggling recording
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | action: "start" \|"stop" \|"toggle"                          |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 400 Bad Request <br />**Content:** `{ "error": "unknown action: <action>"}` |
+| **Error Response**   | **Code:** 400 Bad Request <br /> **Content:** `{ "error": "unknown action: <action>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 </br>
@@ -351,8 +351,8 @@ Simulates user requested control.
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | control: [RemoteControl]                                     |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "required field control missing"}` |
-| **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "invalid control: <control>"}` |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "required field control missing"}` |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "invalid control: <control>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -372,8 +372,8 @@ Simulates user requested macro, a simultaneous control.
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | macro: [ RemoteControl[] ]                                   |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "required field macro missing"}` |
-| **Error Response**   | **Code:** 400 Bad Request<br />**Content:** `{ "error": "invalid macro: <macro>"}` |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "required field macro missing"}` |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "invalid macro: <macro>"}` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
 
 <br/>
@@ -390,8 +390,8 @@ Returns a list of macro pre-defined in config.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "macros": { [macroname]: RemoteControl[] } }` |
-| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "macros": { [macroname]: RemoteControl[] } }` |
+| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br /> **Content:** `{ "error": [string] }` |
 
 <br/>
 
@@ -407,9 +407,9 @@ Returns a macro pre-defined in config.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | name: [string]                                               |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br />**Content: ** `{ "macro": [ RemoteControl[] ] }` |
-| **Error Response**   | **Code:** 404 Not Found<br />**Content:** `{ "error": "macro not found: <name>"}` |
-| **Error Response**   | **Code:** 500  INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "macro": [ RemoteControl[] ] }` |
+| **Error Response**   | **Code:** 404 Not Found<br /> **Content:** `{ "error": "macro not found: <name>"}` |
+| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br /> **Content:** `{ "error": [string] }` |
 
 <br/>
 
@@ -426,8 +426,8 @@ Simulates a macro pre-defined in config.
 | **URL Parameters**   | name: [string]                                               |
 | **Data Parameters**  | None                                                         |
 | **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 404 Not Found<br />**Content:** `{ "error": "macro not found: <name>"}` |
-| **Error Response**   | **Code:** 500  INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
+| **Error Response**   | **Code:** 404 Not Found <br /> **Content:** `{ "error": "macro not found: <name>"}` |
+| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br /> **Content:** `{ "error": [string] }` |
 
 
 
