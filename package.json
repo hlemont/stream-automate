@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
     "obs-websocket-js": "^4.0.2",
     "robotjs": "git+https://github.com/octalmage/robotjs.git"
   },
