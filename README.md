@@ -60,27 +60,51 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
 #### *config.json*: 
 
-```
+```json
 {
-	"serverPort": 4445,
-	"obs": {
-        "address": "localhost",
-        "port": 4444,
-        "password": "1q2w3e4r",
-        // alias for set Current Scene request
-        "sceneAlias": {
-            "exampleAlias": "ActualSceneName"
-        }
-    },
-	"remote": {
-        "allowed": true,
-        "macros": {
-            "macroName": [
-    			// RemoteControl Object
-            ]
-        }
-    }
+  "general": {
+    "serverPort": 4445
+  },
+  "obs": {
+    "address": "localhost",
+    "port": 4444,
+    "password": "1q2w3e4r",
+    "sceneAliases": [
+      {
+        "name": "exampleAlias",
+        "alias": "ActualSceneName"
+      }
+    ]
+  },
+  "remote": {
+    "allowed": true,
+    "macros": [
+      {
+        "name": "example",
+        "macro": [
+          {
+            "type": "key",
+            "key": "r",
+            "modifiers": ["command"]
+          },
+          {
+            "type": "delay",
+            "delay": 500
+          },
+          {
+            "type": "string",
+            "string": "cmd"
+          },
+          {
+            "type": "key",
+            "key": "enter"
+          }
+        ]
+      }
+    ]
+  }
 }
+
 ```
 
 #### obs

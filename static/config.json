@@ -1,36 +1,43 @@
 {
-  "serverPort": 4445,
+  "general": {
+    "serverPort": 4445
+  },
   "obs": {
     "address": "localhost",
     "port": 4444,
     "password": "1q2w3e4r",
-    "sceneAliases": {
-      "exampleAlias": "ActualSceneName"
-    }
+    "sceneAliases": [
+      {
+        "name": "exampleAlias",
+        "alias": "ActualSceneName"
+      }
+    ]
   },
   "remote": {
     "allowed": true,
-    "macros": {
-      "example": [
-        {
-          "type": "key",
-          "modifiers": ["command"],
-          "key": "r"
-        },
-        {
-          "type": "delay",
-          "delay": 100
-        },
-        {
-          "type": "string",
-          "string": "cmd"
-        },
-        {
-          "type": "key",
-          "modifiers": [],
-          "key": "enter"
-        }
-      ]
-    }
+    "macros": [
+      {
+        "name": "example",
+        "macro": [
+          {
+            "type": "key",
+            "key": "r",
+            "modifiers": ["command"]
+          },
+          {
+            "type": "delay",
+            "delay": 500
+          },
+          {
+            "type": "string",
+            "string": "cmd"
+          },
+          {
+            "type": "key",
+            "key": "enter"
+          }
+        ]
+      }
+    ]
   }
 }
