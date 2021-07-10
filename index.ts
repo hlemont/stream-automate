@@ -1,11 +1,12 @@
 import express from 'express';
 import process from 'process';
-import { Server } from './app/Server';
-import fs from 'fs';
+import { loadConfig } from "./app/config";
+import Server from './app/Server';
 
-const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+process.title = "OBSRouter";
+const config = loadConfig();
+console.log(JSON.stringify(config, undefined, 1));
 
 const app = express();
-const server = new Server(app, config);
-process.title = "OBSRouter";
-server.start(config.serverPort)
+const server = new Server(app);
+server.start(config.general.serverPort)
