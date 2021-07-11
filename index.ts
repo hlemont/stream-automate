@@ -20,20 +20,23 @@ rl.on("line", (input) => {
   } else if(_input === "stop") {
     console.log("server is closing...");
     server.stop();				
-    console.log("Press enter to exit");
+    console.log("press enter to exit");
     rl.once("line", () => process.exit(0));
   }
 })
 
 function startServer() {
   try {
-    
-  }
-  // load config
-  const config = loadConfig();
-  console.log(JSON.stringify(config, undefined, 1));
+    // load config
+    const config = loadConfig();
+    console.log(JSON.stringify(config, undefined, 1));
 
-  // initialize and start server
-  server = new Server(app, config.general.serverPort);
-  server.start();
+    // initialize and start server
+    server = new Server(app, config.general.serverPort);
+    server.start();
+  } catch(error) {
+    console.log(`failed to start server: ${error.name}: ${error.message}`);
+    console.log("press enter to exit")
+    rl.once("line", () => process.exit(0));
+  }
 }
