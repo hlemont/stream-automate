@@ -3,6 +3,10 @@
   "version": "1.1.0",
   "description": "",
   "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hlemont/stream-automate.git"
+  },
   "scripts": {
     "start": "nodemon index.ts",
     "clean": "rimraf ./build && rimraf ./dist",
