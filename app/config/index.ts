@@ -31,8 +31,6 @@ function validateConfig(config: any, name: string, schema: Joi.Schema) {
 export function loadConfig() {
 	const newConfig = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
-	console.log(newConfig);
-
 	const general = validateConfig(newConfig.general, "general", generalConfigSchema);
 	const obs = validateConfig(newConfig.obs, "obs", obsConfigSchema);
 	const remote = validateConfig(newConfig.remote, "remote", remoteConfigSchema);
