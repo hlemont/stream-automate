@@ -5,6 +5,7 @@ import {
 	NonHttpError,
 	RequestValidationError,
 	ResourceDoesNotExistError,
+	OBSError,
 } from "./Error";
 
 export function httpErrorHandler(
@@ -19,7 +20,6 @@ export function httpErrorHandler(
 	} else {
 		res.send({ error: err.message });
 	}
-	next();
 }
 
 export function requestErrorHandler(
@@ -62,11 +62,6 @@ export function requestErrorHandler(
 			next(new HttpError(400, err));
 		}
 	} else if (err.name === "OBSError") {
-		// handle some user-fault errors here
-		if(err.message === "requested scene does not exist") {
-			next(new HttpError(404, new ResourceDoesNotExistError(err.message)));
-		}
-
 		next(new HttpError(500, err));
 	} else if (err.name === "SyntaxError") {
 		next(
@@ -80,5 +75,17 @@ export function requestErrorHandler(
 		);
 	} else {
 		next(new HttpError(500, err));
+	}
+}
+
+export function obsErrorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+	if(err.name !== "OBSError") 
+		next(err);
+
+	// handle user-fault obs errors here
+	if(err.message === "requested scene does not exist") {
+		next(new ResourceDoesNotExistError(err.message));
+	} else {
+		next(err);
 	}
 }

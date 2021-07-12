@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import http from "http";
 import Route from "./routes";
-import { httpErrorHandler, requestErrorHandler } from "./util/ErrorHandler";
+import { httpErrorHandler, obsErrorHandler, requestErrorHandler } from "./util/ErrorHandler";
 import { config } from "./config";
 import { OBS, Remote } from "./services";
 
@@ -29,6 +29,7 @@ export default class Server {
 		this.app.use(Route({ obs: this.obs, remote: this.remote }));
 
 		// use error handlers
+		this.app.use(obsErrorHandler);
 		this.app.use(requestErrorHandler);
 		this.app.use(httpErrorHandler);
 	}
