@@ -71,8 +71,8 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
     "password": "1q2w3e4r",
     "sceneAliases": [
       {
-        "name": "exampleAlias",
-        "alias": "ActualSceneName"
+        "name": "ActualSceneName",
+        "alias": "exampleAlias"
       }
     ]
   },
@@ -120,18 +120,21 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
   OBS 웹소켓 서버의 비밀번호
 
-- `sceneAlias`:  alias for scene name
+- `sceneAliases`:  aliases for scene name
 
   장면 이름의 별칭
 
 ```
-"sceneAlias": {
-    [alias: string]: [sceneName: string]
-}
+"sceneAliases": [
+  {
+    "alias": string,
+    "name": string
+  }
+]
 ```
 
-> Scene names of `alias` in API Request, will be replaced with `sceneName`. And scene names of `sceneName` in API Response, will be replaced with first matching `alias`.
-> API 요청의 장면 이름 중 `alias`인 것은 `sceneName`으로, API 응답의 장면 이름 중 `sceneName`인 것은 첫 번째 매치된 `alias`로 교체됩니다. 
+> Scene names of `alias` in API Request, will be replaced with `name`. And scene names of `name` in API Response, will be replaced with first matching `alias`.
+> API 요청의 장면 이름 중 `alias`인 것은 `name`으로, API 응답의 장면 이름 중 `name`인 것은 첫 번째 매치된 `alias`로 교체됩니다. 
 
 
 
