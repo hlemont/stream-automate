@@ -71,8 +71,8 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
     "password": "1q2w3e4r",
     "sceneAliases": [
       {
-        "name": "exampleAlias",
-        "alias": "ActualSceneName"
+        "name": "ActualSceneName",
+        "alias": "exampleAlias"
       }
     ]
   },
