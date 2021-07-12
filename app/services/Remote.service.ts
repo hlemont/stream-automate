@@ -19,6 +19,11 @@ export default class Remote {
 	private eventHandler: (message: string) => void;
 	readonly allowed: boolean;
 
+	/**
+	 * A service object for remote(robotjs)
+	 * @param config a config to use in service
+	 * @param eventHandler a function to process messages on event
+	 */
 	constructor(config: RemoteConfig, eventHandler: (message: string) => void) {
 		this.macros = config.macros.reduce(
 			(prev, curr) => ({ ...prev, [curr.name]: new Macro(curr.macro, true) }),
@@ -34,6 +39,11 @@ export default class Remote {
 		robotjs.setKeyboardDelay(1);
 	}
 
+	/**
+	 * Get a specific macro loaded in original object form
+	 * @param name a name of macro loaded
+	 * @returns an original object of the requested macro
+	 */
 	public getMacro(name: string): RemoteMacro {
 		if (!(name in this.rawMacros)) {
 			throw new ResourceDoesNotExistError("macro does not exist");
@@ -41,14 +51,28 @@ export default class Remote {
 		return this.rawMacros[name];
 	}
 
+	/**
+	 * Get a list of macros in original object form
+	 * @returns a list of original object of the macros
+	 */
 	public getMacros(): { [name: string]: RemoteMacro } {
 		return this.rawMacros;
 	}
 
+	/**
+	 * Send an event message with eventhandler
+	 * @param message an event message
+	 */
 	public handleEvent(message: string) {
 		this.eventHandler(message);
 	}
 
+	/**
+	 * Run a macro by name or of RemoteMacro object
+	 * @param name a name of macro to run
+	 * @param macro a RemoteMacro object to run
+	 * @returns Promise
+	 */
 	public async runMacro(name: string): Promise<any>;
 	public async runMacro(macro: RemoteMacro): Promise<any>;
 	public async runMacro(arg: string | RemoteMacro): Promise<any> {
@@ -64,6 +88,11 @@ export default class Remote {
 		}
 	}
 
+	/**
+	 * Run a control of RemoteControl object
+	 * @param control a RemoteControl object to run
+	 * @returns Promise
+	 */
 	public async runControl(control: RemoteControl): Promise<any> {
 		this.handleEvent(
 			`Remote Control: ${JSON.stringify(control, undefined, 1)}`

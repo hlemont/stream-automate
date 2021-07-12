@@ -9,6 +9,11 @@ export default class OBS {
 	private eventHandler: (message: string) => void;
 	public websocket: OBSWebSocket;
 
+	/**
+	 * A service object for obs websocket
+	 * @param config a config to use in service
+	 * @param eventHandler a function to process messages on event
+	 */
 	constructor(config: OBSConfig, eventHandler: (message: string) => void) {
 		this.config = config;
 		this.isConnected = false;
@@ -39,6 +44,10 @@ export default class OBS {
 		return;
 	}
 
+	/**
+	 * Connect to obs websocket server 
+	 * @returns Promise that resolves when connection established
+	 */
 	public connect() {
 		return new Promise<boolean>((resolve, reject) => {
 			if (this.isConnected) {
@@ -59,23 +68,37 @@ export default class OBS {
 		});
 	}
 
+	/**
+	 * Send an event message with eventhandler
+	 * @param message an event message
+	 */
 	public handleEvent(message: string): void {
 		this.eventHandler(message);
 	}
 
-	public applySceneAlias(name: string) {
-		if (name in this.sceneAliases) {
-			return this.sceneAliases[name];
+	/**
+	 * Translate alias to actual scene name
+	 * @param alias an alias to translate into scene name
+	 * @returns actual scene name
+	 */
+	public applySceneAlias(alias: string) {
+		if (alias in this.sceneAliases) {
+			return this.sceneAliases[alias];
 		} else {
-			return name;
+			return alias;
 		}
 	}
 
-	public reverseSceneAlias(alias: string) {
-		if(alias in this.reversedSceneAliases) {
-			return this.reversedSceneAliases[alias]
+	/**
+	 * Translate name to scene alias
+	 * @param name a name to translate into alias
+	 * @returns alias
+	 */
+	public reverseSceneAlias(name: string) {
+		if(name in this.reversedSceneAliases) {
+			return this.reversedSceneAliases[name]
 		} else {
-			return alias;
+			return name;
 		}
 	}
 }
