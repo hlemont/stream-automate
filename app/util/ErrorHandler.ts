@@ -4,6 +4,7 @@ import {
 	RequestContext,
 	NonHttpError,
 	RequestValidationError,
+	ResourceDoesNotExistError,
 } from "./Error";
 
 export function httpErrorHandler(
@@ -14,16 +15,11 @@ export function httpErrorHandler(
 ) {
 	res.status(err.code);
 	if (err.code === 500) {
-		console.log(err.original);
 		res.send({ error: "internal server error" });
 	} else {
-		if (err.original.name === "RequestValidationError") {
-			console.log(
-				`${err.original.name}<${err.original.context}>: ${err.message}`
-			);
-		}
 		res.send({ error: err.message });
 	}
+	next();
 }
 
 export function requestErrorHandler(
@@ -32,7 +28,15 @@ export function requestErrorHandler(
 	res: Response,
 	next: NextFunction
 ) {
-	console.log(`${err.name}: ${err.message}`);
+	// log events
+	if (err.name === "RequestValidationError") {
+		console.log(
+			`${err.name}<${err.context as RequestContext}>: ${err.message}`
+		);
+	} else {
+		console.log(`${err.name}: ${err.message}`);
+	}
+
 	if (err.name === "RequestValidationError") {
 		if (err.context === RequestContext.url) {
 			next(new HttpError(404, err));
@@ -52,13 +56,17 @@ export function requestErrorHandler(
 	} else if (err.name === "RemoteValidationError") {
 		next(new HttpError(400, err));
 	} else if (err.name === "RemoteExecutionError") {
-		if(err.isInternal) {
+		if (err.isInternal) {
 			next(new HttpError(500, err));
 		} else {
 			next(new HttpError(400, err));
 		}
 	} else if (err.name === "OBSError") {
 		// handle some user-fault errors here
+		if(err.message === "requested scene does not exist") {
+			next(new HttpError(404, new ResourceDoesNotExistError(err.message)));
+		}
+
 		next(new HttpError(500, err));
 	} else if (err.name === "SyntaxError") {
 		next(
