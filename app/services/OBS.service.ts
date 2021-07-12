@@ -13,11 +13,11 @@ export default class OBS {
 		this.config = config;
 		this.isConnected = false;
 		this.sceneAliases = config.sceneAliases.reduce(
-			(prev, curr) => ({ ...prev, [curr.name]: curr.alias }),
+			(prev, curr) => ({ ...prev, [curr.alias]: curr.name }),
 			{}
 		);
 		this.reversedSceneAliases = config.sceneAliases.reduce(
-			(prev, curr) => ({...prev, [curr.alias]: curr.name}), {}
+			(prev, curr) => ({...prev, [curr.name]: curr.alias}), {}
 		);
 		this.eventHandler = eventHandler;
 		this.websocket = new OBSWebSocket();
