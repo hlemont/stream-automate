@@ -10,8 +10,8 @@ export default function Route(remote: Remote) {
 		.route("")
 		.get(
 			ash(async (req, res) => {
-				console.log(remote.getMacros());
-				res.json({macros: remote.getMacros()});
+				const macros = remote.getMacros();
+				res.json({macros});
 			})
 		)
 		.post(
@@ -53,8 +53,7 @@ export default function Route(remote: Remote) {
 			ash(async (req, res) => {
 				const { name } = req.params;
 				try {
-					const macro = remote.getMacro(name);
-					await remote.runMacro(macro);
+					await remote.runMacro(name);
 				} catch (error) {
 					throw error;
 				}

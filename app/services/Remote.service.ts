@@ -64,11 +64,14 @@ export default class Service {
 	/**
 	 * Run a macro
 	 * @param data a raw object representing the macro to run
+	 * @param name a name of the macro to run
 	 * @returns Promise
 	 */
-	public async runMacro(data: Remote.Macro): Promise<any> {
-		this.handleEvent(`Remote Macro: ${JSON.stringify(data, undefined, 1)}`);
-		const macro = new Macro(data);
+	public async runMacro(name: string): Promise<any>;
+	public async runMacro(data: Remote.Macro): Promise<any>;
+	public async runMacro(arg: Remote.Macro | string): Promise<any> {
+		this.handleEvent(`Remote Macro: ${JSON.stringify(arg, undefined, 1)}`);
+		const macro = typeof arg === "string" ? this.macros[arg].built : new Macro(arg);
 		if(macro.run)
 			return await macro.run();
 	}
