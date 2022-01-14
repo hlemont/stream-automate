@@ -8,7 +8,7 @@
 		"url": "https://github.com/hlemont/stream-automate.git"
 	},
 	"scripts": {
-		"start": "nodemon index.ts",
+		"start": "nodemon --exec npx ts-node index.ts",
 		"clean": "rimraf ./build && rimraf ./dist",
 		"copy-static": "copyfiles -u 1 ./static/**/*.* ./dist",
 		"build": "tsc --project ./",
@@ -18,10 +18,10 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@nut-tree/nut-js": "^2.0.0",
 		"express": "^4.17.1",
 		"express-async-handler": "^1.1.4",
-		"obs-websocket-js": "^4.0.3",
-		"robotjs": "git+https://github.com/octalmage/robotjs.git"
+		"obs-websocket-js": "^4.0.3"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.12",
@@ -31,8 +31,8 @@
 		"nodemon": "^2.0.7",
 		"pkg": "^5.2.1",
 		"rimraf": "^3.0.2",
-		"ts-node": "^10.0.0",
-		"typescript": "^4.3.2"
+		"ts-node": "^10.4.0",
+		"typescript": "^4.5.4"
 	},
 	"bin": "build/index.js",
 	"pkg": {
