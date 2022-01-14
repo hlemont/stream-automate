@@ -1,5 +1,6 @@
 import fs from "fs";
 import Joi from "joi";
+import { Remote } from "../services";
 import {
 	Config as GeneralConfig,
 	configSchema as generalConfigSchema,
@@ -10,11 +11,13 @@ import {
 	configSchema as remoteConfigSchema,
 } from "./Remote";
 
-interface Config {
+export interface Config {
 	general: GeneralConfig;
 	obs: OBSConfig;
 	remote: RemoteConfig;
 }
+
+export let config: Config;
 
 function validateConfig(config: any, name: string, schema: Joi.Schema) {
 	const { error, value } = schema
@@ -44,13 +47,5 @@ export function loadConfig() {
 	return config;
 }
 
-export let config: Config;
-export { Config as OBSConfig } from "./OBS";
-export {
-	Config as RemoteConfig,
-	ControlType as RemoteControlType,
-	Control as RemoteControl,
-	Macro as RemoteMacro,
-	controlSchema as remoteControlSchema,
-	macroSchema as remoteMacroSchema,
-} from "./Remote";
+export * as Remote from "./Remote";
+export * as OBS from "./OBS";
