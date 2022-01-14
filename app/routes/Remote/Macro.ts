@@ -53,7 +53,8 @@ export default function Route(remote: Remote) {
 			ash(async (req, res) => {
 				const { name } = req.params;
 				try {
-					await remote.runMacro(name);
+					const macro = remote.getMacro(name);
+					await remote.runMacro(macro);
 				} catch (error) {
 					throw error;
 				}

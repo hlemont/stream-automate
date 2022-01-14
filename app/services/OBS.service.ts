@@ -1,8 +1,8 @@
-import { OBSConfig } from "../config";
+import { OBS } from "../config";
 import OBSWebSocket from "obs-websocket-js";
 
-export default class OBS {
-	private config: OBSConfig;
+export default class Service {
+	private config: OBS.Config;
 	private isConnected: boolean;
 	private sceneAliases: { [name: string]: string };
 	private reversedSceneAliases: { [alias: string]: string };
@@ -14,7 +14,7 @@ export default class OBS {
 	 * @param config a config to use in service
 	 * @param eventHandler a function to process messages on event
 	 */
-	constructor(config: OBSConfig, eventHandler: (message: string) => void) {
+	constructor(config: OBS.Config, eventHandler: (message: string) => void) {
 		this.config = config;
 		this.isConnected = false;
 		this.sceneAliases = config.sceneAliases.reduce(

@@ -1,21 +1,15 @@
-import robotjs from "robotjs";
-import {
-	RemoteConfig,
-	RemoteControlType,
-	RemoteControl,
-	RemoteMacro,
-	remoteControlSchema,
-	remoteMacroSchema,
-} from "../config";
+import { keyboard, Key } from "@nut-tree/nut-js";
+import { build } from "joi";
+import { Remote } from "../config";
 import {
 	ResourceDoesNotExistError,
 	RemoteValidationError,
 	RemoteExecutionError,
 } from "../util/Error";
 
-export default class Remote {
-	private macros: { [name: string]: Macro };
-	private rawMacros: { [name: string]: RemoteMacro };
+export default class Service {
+	private macros: { [name: string]: {built: Macro, raw: Remote.Macro} };
+	private controls: { [name: string]: { built: Control, raw: Remote.Control } };
 	private eventHandler: (message: string) => void;
 	readonly allowed: boolean;
 
@@ -24,39 +18,39 @@ export default class Remote {
 	 * @param config a config to use in service
 	 * @param eventHandler a function to process messages on event
 	 */
-	constructor(config: RemoteConfig, eventHandler: (message: string) => void) {
+	constructor(config: Remote.Config, eventHandler: (message: string) => void) {
 		this.macros = config.macros.reduce(
-			(prev, curr) => ({ ...prev, [curr.name]: new Macro(curr.macro, true) }),
+			(prev, curr) => ({ ...prev, [curr.name]: {built: new Macro(curr.macro), raw: curr.macro}}),
 			{}
 		);
-		this.rawMacros = config.macros.reduce(
-			(prev, curr) => ({ ...prev, [curr.name]: curr.macro }),
-			{}
-		);
+		// not implemented yet
+		this.controls = {}
 		this.eventHandler = eventHandler;
 		this.allowed = config.allowed;
-
-		robotjs.setKeyboardDelay(1);
+		keyboard.config.autoDelayMs = 1;
 	}
 
 	/**
-	 * Get a specific macro loaded in original object form
-	 * @param name a name of macro loaded
-	 * @returns an original object of the requested macro
+	 * Get a specific macro added
+	 * @param name a name
+	 * @returns a macro
 	 */
-	public getMacro(name: string): RemoteMacro {
-		if (!(name in this.rawMacros)) {
+	public getMacro(name: string): Remote.Macro {
+		if (!(name in this.macros)) {
 			throw new ResourceDoesNotExistError("macro does not exist");
 		}
-		return this.rawMacros[name];
+		return this.macros[name].raw;
 	}
 
 	/**
-	 * Get a list of macros in original object form
-	 * @returns a list of original object of the macros
+	 * Get all loaded macros
+	 * @returns a dictionary of all loaded macros
 	 */
-	public getMacros(): { [name: string]: RemoteMacro } {
-		return this.rawMacros;
+	public getMacros(): { [name: string]: Remote.Macro } {
+		return Object.keys(this.macros).reduce((prev, name) => {
+			prev[name] = this.macros[name].raw;
+			return prev;
+		}, <{[name:string]:Remote.Macro}>{})
 	}
 
 	/**
@@ -68,141 +62,115 @@ export default class Remote {
 	}
 
 	/**
-	 * Run a macro by name or of RemoteMacro object
-	 * @param name a name of macro to run
-	 * @param macro a RemoteMacro object to run
+	 * Run a macro
+	 * @param data a raw object representing the macro to run
 	 * @returns Promise
 	 */
-	public async runMacro(name: string): Promise<any>;
-	public async runMacro(macro: RemoteMacro): Promise<any>;
-	public async runMacro(arg: string | RemoteMacro): Promise<any> {
-		if (typeof arg === "string") {
-			if (!(arg in this.macros)) {
-				throw new ResourceDoesNotExistError("macro does not exist");
-			}
-			this.handleEvent(`Remote Macro: ${arg}`);
-			return await this.macros[arg].run();
-		} else {
-			this.handleEvent(`Remote Macro: ${JSON.stringify(arg, undefined, 1)}`);
-			return await new Macro(arg).run();
-		}
+	public async runMacro(data: Remote.Macro): Promise<any> {
+		this.handleEvent(`Remote Macro: ${JSON.stringify(data, undefined, 1)}`);
+		const macro = new Macro(data);
+		if(macro.run)
+			return await macro.run();
 	}
-
 	/**
-	 * Run a control of RemoteControl object
-	 * @param control a RemoteControl object to run
+	 * Run a control
+	 * @param data a raw object representing the control to run
 	 * @returns Promise
 	 */
-	public async runControl(control: RemoteControl): Promise<any> {
+	public async runControl(data: Remote.Control): Promise<any> {
 		this.handleEvent(
-			`Remote Control: ${JSON.stringify(control, undefined, 1)}`
+			`Remote Control: ${JSON.stringify(data, undefined, 1)}`
 		);
-		return await new Control(control).run();
-	}
-}
-
-class Control {
-	readonly run: () => Promise<any>;
-
-	constructor(control: RemoteControl, internal?: boolean) {
-		const isInternal = internal !== undefined ? internal : false;
-		this.run = Control.toFunction(control);
-	}
-
-	static validate(control: RemoteControl): boolean {
-		const { error } = remoteControlSchema
-			.prefs({ errors: { label: "key" } })
-			.validate(control);
-		return error === undefined;
-	}
-
-	static toFunction(
-		control: RemoteControl,
-		internal?: boolean
-	): () => Promise<any> {
-		const isInternal = internal !== undefined ? internal : false;
-
-		if (!Control.validate(control)) {
-			throw new RemoteValidationError("invalid control");
-		}
-		if (control.type === RemoteControlType.keyTapping) {
-			return function () {
-				console.log(control);
-				console.log("keytapping");
-				return new Promise((resolve, reject) => {
-					try {
-						if (control.modifiers) {
-							robotjs.keyTap(control.key, control.modifiers);
-						} else {
-							robotjs.keyTap(control.key);
-						}
-					} catch (error) {
-						reject(new RemoteExecutionError(isInternal, error?.message));
-					}
-					resolve(undefined);
-				});
-			};
-		} else if (control.type === RemoteControlType.stringTyping) {
-			return function () {
-				console.log(control);
-				console.log("stringTyping");
-				return new Promise((resolve, reject) => {
-					try {
-						robotjs.typeString(control.string);
-					} catch (error) {
-						reject(new RemoteExecutionError(isInternal, error.message));
-					}
-					resolve(undefined);
-				});
-			};
-		} else if (control.type === RemoteControlType.delaying) {
-			return function () {
-				console.log(control);
-				console.log("delaying");
-				return new Promise((resolve) => setTimeout(resolve, control.delay));
-			};
-		} else {
-			// will not be executed
-			return function () {
-				console.log(control);
-				console.log("unknown");
-				return new Promise((resolve) => resolve(undefined));
-			};
-		}
+		const control = new Control(data);
+		if (control.run)
+			return await control?.run();
 	}
 }
 
 class Macro {
-	readonly run: () => Promise<any>;
+	private valid: boolean;
+	run?: () => Promise<any>
 
-	constructor(macro: RemoteMacro, internal?: boolean) {
-		const isInternal = internal !== undefined ? internal : false;
-		this.run = Macro.toFunction(macro, isInternal);
-	}
-
-	static validate(macro: RemoteMacro): boolean {
-		const { error } = remoteMacroSchema
-			.prefs({ errors: { label: "key" } })
-			.validate(macro);
+	static validate(macro: any): boolean {
+		const { error } = Remote.macroSchema.validate(macro);
 		return error === undefined;
 	}
 
-	static toFunction(
-		macro: RemoteMacro,
-		internal?: boolean
-	): () => Promise<any> {
-		const isInternal = internal !== undefined ? internal : false;
-		if (!Macro.validate(macro)) {
-			throw new RemoteValidationError("invalid Macro");
-		}
-
-		const functions = macro.map((control) =>
-			Control.toFunction(control, isInternal)
-		);
-		return async function () {
-			for (const func of functions) {
-				await func();
+	static build(data: Remote.Macro): () => Promise<void> {
+		return ((data) => {
+			const controls = data.controls.map((control) => Control.build(control));
+			return async () => {
+				for (const control of controls) {
+					if(control)
+						await control();
+				}
 			}
-		};
+		})(data)
+	}
+
+	constructor(data: any) {
+		if (!Macro.validate(data)) {
+			this.valid = false;
+			throw new RemoteValidationError("invalid Macro");
+		} else {
+			this.valid = true;
+			this.run = Macro.build(data as Remote.Macro);
+		}
+	}
+}
+
+class Control {
+	private valid: boolean;
+	run?: () => Promise<any>
+
+	static validate(control: any): boolean {
+		const { error } = Remote.controlSchema.validate(control);
+		return error === undefined;
+	}
+
+	static build(data: Remote.Control): (() => Promise<any>) | undefined {
+		switch (data.type) {
+			case Remote.ControlType.keyTapping:
+				return ((data) => {
+					const modifiers = data.modifiers?.map((modifier) => (<any>Key)[modifier]).filter((value) => value !== undefined);
+					const key = (<any>Key)[data.key];
+					if(key === undefined) {
+						return undefined;
+					}
+					else if(modifiers) {
+						return async () => {
+							for (const modifier of modifiers)
+								await keyboard.pressKey(modifier);
+							await keyboard.type(key);
+							for (const modifier of modifiers)
+								await keyboard.releaseKey(modifier);
+						}
+					} else {
+						return async () => {
+							await keyboard.type(key);
+						}
+					}
+				})(data);
+			case Remote.ControlType.stringTyping:
+				return async () => {
+					await keyboard.type(data.string);
+				}
+			case Remote.ControlType.delaying:
+				return async () => {
+					await new Promise(resolve => setTimeout(resolve, data.delay));
+				}
+			default:
+				return undefined;
+		}
+	}
+
+	constructor(data: any) {
+		if (!Control.validate(data)) {
+			this.valid = false;
+			throw new RemoteValidationError("invalid Macro");
+		} else {
+			this.valid = true;
+			this.run = Control.build(data as Remote.Control);
+		}
 	}
 }
