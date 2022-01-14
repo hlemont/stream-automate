@@ -18,25 +18,29 @@
     "macros": [
       {
         "name": "example",
-        "macro": [
-          {
-            "type": "key",
-            "key": "r",
-            "modifiers": ["command"]
-          },
-          {
-            "type": "delay",
-            "delay": 500
-          },
-          {
-            "type": "string",
-            "string": "cmd"
-          },
-          {
-            "type": "key",
-            "key": "enter"
-          }
-        ]
+        "macro": {
+          "controls": [
+            {
+              "type": "key",
+              "key": "R",
+              "modifiers": [
+                "LeftSuper"
+              ]
+            },
+            {
+              "type": "delay",
+              "delay": 500
+            },
+            {
+              "type": "string",
+              "string": "cmd"
+            },
+            {
+              "type": "key",
+              "key": "Enter"
+            }
+          ]
+        }
       }
     ]
   }
