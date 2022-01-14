@@ -34,7 +34,7 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
 
 
-현재는 장면 전환 기능, 송출 및 녹화 시작/정지 기능과 원격 조작 기능을 구현하고 있습니다만, 필요성과 가능성에 따라 추가될 예정입니다. 
+현재는 장면 전환 기능, 송출 및 녹화 시작/정지 기능과 원격 조작 기능을 구현하고 있으며, 필요성과 가능성에 따라 추가될 예정입니다. 
 
 <br/>
 
@@ -81,29 +81,34 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
     "macros": [
       {
         "name": "example",
-        "macro": [
-          {
-            "type": "key",
-            "key": "r",
-            "modifiers": ["command"]
-          },
-          {
-            "type": "delay",
-            "delay": 500
-          },
-          {
-            "type": "string",
-            "string": "cmd"
-          },
-          {
-            "type": "key",
-            "key": "enter"
-          }
-        ]
+        "macro": {
+          "controls": [
+            {
+              "type": "key",
+              "key": "R",
+              "modifiers": [
+                "LeftSuper"
+              ]
+            },
+            {
+              "type": "delay",
+              "delay": 500
+            },
+            {
+              "type": "string",
+              "string": "cmd"
+            },
+            {
+              "type": "key",
+              "key": "Enter"
+            }
+          ]
+        }
       }
     ]
   }
 }
+
 
 ```
 
@@ -150,11 +155,12 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 
 ```
 "macros": {
-    "macroName": [ RemoteControl[] ]
+    "name": <macro name>,
+    "macros": control[]
 }
 ```
 
-See: [API Documentation - RemoteControl](#RemoteControl)
+See: [API Documentation - Controls and Macros](#Controls-and-Macros)
 
 
 
@@ -164,7 +170,7 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 
 #### [**Typedef**](#Typedef)
 
-- [RemoteControl](#RemoteControl)
+- [Controls and Macros](#Controls-and-Macros)
 
 #### [OBS](#OBS-2)
 
@@ -175,39 +181,49 @@ See: [API Documentation - RemoteControl](#RemoteControl)
 - [OBS/Record](#OBS/Record)
 
 #### [Remote](#Remote-2)
-
-- [Remote](#Remote-2)
+- [Remote/Control](#Remote/Control)
 - [Remote/Macro](#Remote/Macro)
 
 <br/>
 
 ### Typedef
 
-#### RemoteControl
+#### Controls and Macros
 
 ```
-// key: keyTapping
+// key: Tap a single key with modifiers like LeftShift, ...
+// string: Type a string
+// delay: adding delay between controls in macro
+Control = KeyTappingControl | StringTypingControl | Delay
+
+KeyTappingControl =
 {
     "type": "key",
-   	"key": string,
+    "key": string,
     "modifiers": string[],
 }
 
-// string: stringTyping
+StringTypingControl =
 {
     "type": "string",
     "string": string
 }
 
-// delay: adding delay between RemoteControls in macro
+Delay = 
 {
     "type": "delay",
-    "delay": ms
+    "delay": number(ms)
+}
+
+Macro = {
+  "controls": Control[]
 }
 ```
 
-> Check [Robotjs API - keys](https://robotjs.io/docs/syntax#keys) for supported keys. `"modifiers"` accepts command, control, shift, alt.
-> [Robotjs API - keys](https://robotjs.io/docs/syntax#keys)에서 지원되는 key 값을 확인해 주세요. `"modifiers"`는 command, control, shift, alt 키가 허용됩니다.
+> Check [Nut.js Keys](https://nut-tree.github.io/apidoc/enums/key_enum.Key.html) for supported keys. (Standard 105 key US layout keyboard)
+> Korean letters or other unicode letters are not supported by Nut.js currently.
+> [Nut.js Keys](https://nut-tree.github.io/apidoc/enums/key_enum.Key.html)에서 지원되는 key 값을 확인해 주세요. (105 키 US layout keyboard)
+> 한글 등의 유니코드 문자는 현재 Nut.js가 지원하지 않습니다.
 
 <br/>
 
@@ -388,25 +404,6 @@ Simulates user requested control.
 
 ### Remote/Macro
 
-#### Run User Macro
-
-Simulates user requested macro, a simultaneous control.
-
-사용자가 요청한 매크로, 즉 연속된 조작을 시뮬레이션합니다.
-
-| Title                | Run User Macro                                               |
-| -------------------- | ------------------------------------------------------------ |
-| **URL**              | `/remote/macro`                                              |
-| **Method**           | **POST**                                                     |
-| **URL Parameters**   | None                                                         |
-| **Data Parameters**  | macro: [ RemoteControl[] ]                                   |
-| **Success Response** | **Code:** 204 No Content                                     |
-| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "required field macro missing"}` |
-| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "invalid macro: <macro>"}` |
-| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
-
-<br/>
-
 #### Get Pre-defined Macro list
 
 Returns a list of macro pre-defined in config.
@@ -419,10 +416,30 @@ Returns a list of macro pre-defined in config.
 | **Method**           | **GET**                                                      |
 | **URL Parameters**   | None                                                         |
 | **Data Parameters**  | None                                                         |
-| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "macros": { [macroname]: RemoteControl[] } }` |
+| **Success Response** | **Code:** 200 OK <br /> **Content:** `{ "macros": { [macroname]: Macro } }` |
 | **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br /> **Content:** `{ "error": [string] }` |
 
 <br/>
+
+#### Run User Macro
+
+Simulates user requested macro, a simultaneous control.
+
+사용자가 요청한 매크로, 즉 연속된 조작을 시뮬레이션합니다.
+
+| Title                | Run User Macro                                               |
+| -------------------- | ------------------------------------------------------------ |
+| **URL**              | `/remote/macro`                                              |
+| **Method**           | **POST**                                                     |
+| **URL Parameters**   | None                                                         |
+| **Data Parameters**  | macro: Macro                                                 |
+| **Success Response** | **Code:** 204 No Content                                     |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "required field macro missing"}` |
+| **Error Response**   | **Code:** 400 Bad Request<br /> **Content:** `{ "error": "invalid macro: <macro>"}` |
+| **Error Response**   | **Code:** 500 INTERNAL SERVER ERROR <br />**Content:** `{ "error": [string] }` |
+
+<br/>
+
 
 #### Get Pre-defined Macro
 
