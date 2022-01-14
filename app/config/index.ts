@@ -1,19 +1,14 @@
 import fs from "fs";
 import Joi from "joi";
-import { Config as GeneralConfig, configSchema as generalConfigSchema} from "./General";
+import {
+	Config as GeneralConfig,
+	configSchema as generalConfigSchema,
+} from "./General";
 import { Config as OBSConfig, configSchema as obsConfigSchema } from "./OBS";
 import {
 	Config as RemoteConfig,
 	configSchema as remoteConfigSchema,
 } from "./Remote";
-
-const configSchema = Joi.object()
-	.keys({
-		general : generalConfigSchema.required(),
-		obs: obsConfigSchema.required(),
-		remote: remoteConfigSchema.required(),
-	})
-	.unknown();
 
 interface Config {
 	general: GeneralConfig;
@@ -22,24 +17,30 @@ interface Config {
 }
 
 function validateConfig(config: any, name: string, schema: Joi.Schema) {
-	const {error, value} = schema.prefs({ errors: {label: "key" }}).validate(config);
-	if(error) 
+	const { error, value } = schema
+		.prefs({ errors: { label: "key" } })
+		.validate(config);
+	if (error)
 		throw new Error(`error on validating '${name}' config: ${error.message}`);
-	return value;	
+	return value;
 }
 
 export function loadConfig() {
 	const newConfig = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
-	const general = validateConfig(newConfig.general, "general", generalConfigSchema);
+	const general = validateConfig(
+		newConfig.general,
+		"general",
+		generalConfigSchema
+	);
 	const obs = validateConfig(newConfig.obs, "obs", obsConfigSchema);
 	const remote = validateConfig(newConfig.remote, "remote", remoteConfigSchema);
-	
+
 	config = {
 		general,
 		obs,
-		remote
-	}
+		remote,
+	};
 	return config;
 }
 
@@ -51,5 +52,5 @@ export {
 	Control as RemoteControl,
 	Macro as RemoteMacro,
 	controlSchema as remoteControlSchema,
-	macroSchema as remoteMacroSchema
+	macroSchema as remoteMacroSchema,
 } from "./Remote";

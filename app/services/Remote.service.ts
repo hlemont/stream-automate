@@ -137,7 +137,7 @@ class Control {
 							robotjs.keyTap(control.key);
 						}
 					} catch (error) {
-						reject(new RemoteExecutionError(isInternal, error.message));
+						reject(new RemoteExecutionError(isInternal, error?.message));
 					}
 					resolve(undefined);
 				});
