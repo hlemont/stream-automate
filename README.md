@@ -41,12 +41,11 @@ Stream-automate는 간단하게 DIY 자동화 방송 관리 시스템을 구성�
 ## Installation
 
 1. Get the latest release of stream-automate from [releases](https://github.com/hlemont/stream-automate/releases) and follow the instructions.
-
 2. Install OBS Websocket from [official site](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466).
 3. Configure OBS Websocket, assigning port and password in the OBS.
 4. Open `config.json` in the folder, and edit `"obs.address"`, `"obs.port"`, and `"obs.password"` as your environment.
 
-
+&nbsp;
 
 1. [releases](https://github.com/hlemont/stream-automate/releases)에서 최신 버전의 릴리즈를 받고 안내한 절차에 맞춰 설치를 진행하세요
 2. [OBS Websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466)을 설치하세요.
