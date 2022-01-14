@@ -11,7 +11,7 @@ export default function Route(remote: Remote) {
 		.get(
 			ash(async (req, res) => {
 				console.log(remote.getMacros());
-				res.json(remote.getMacros());
+				res.json({macros: remote.getMacros()});
 			})
 		)
 		.post(
